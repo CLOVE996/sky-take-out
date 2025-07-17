@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService {
+public  class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeMapper employeeMapper;
@@ -89,6 +89,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         PageHelper.startPage(employeePageQuery.getPage(), employeePageQuery.getPageSize());
         Page<Employee> page = employeeMapper.page(employeePageQuery);
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee getById(Long id) {
+        return employeeMapper.getById(id);
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
     }
 
 }
