@@ -1,6 +1,4 @@
 package com.sky.controller.admin;
-
-
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
@@ -12,7 +10,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequestMapping("/admin/dish")
@@ -64,5 +61,20 @@ public class DishController {
         log.info("修改菜品，参数为{}",dishDTO);
         dishService.update(dishDTO);
         return Result.success();
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("起售、停售菜品")
+    public Result startOrStop(@PathVariable Integer status,Long id){
+        log.info("起售、停售菜品，id为{}",id);
+        dishService.startOrStop(status,id);
+        return Result.success();
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result getDishByCategoryId(@RequestParam Long categoryId) {
+        List<DishVO> dishVOList = dishService.getDishByCategoryId(categoryId);
+        return Result.success(dishVOList);
     }
 }

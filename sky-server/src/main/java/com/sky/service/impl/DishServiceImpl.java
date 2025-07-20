@@ -8,10 +8,12 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -34,6 +36,8 @@ public class DishServiceImpl implements DishService {
     DishFlavorMapper dishFlavorMapper;
     @Autowired
     SetmealDishMapper setmealDishMapper;
+    @Autowired
+    SetmealMapper setmealMapper;
 
 
     @Transactional
@@ -89,7 +93,7 @@ public class DishServiceImpl implements DishService {
     public DishVO getByIdWithFlavors(Long id) {
         Dish dish = dishMapper.getByid(id);
         DishVO dishVO = new DishVO();
-        BeanUtils.copyProperties(dish,dishVO);
+        BeanUtils.copyProperties(dish, dishVO);
         dishVO.setFlavors(dishFlavorMapper.getByDishId(id));
         return dishVO;
     }
@@ -98,7 +102,7 @@ public class DishServiceImpl implements DishService {
     @Override
     public void update(DishDTO dishDTO) {
         Dish dish = new Dish();
-        BeanUtils.copyProperties(dishDTO,dish);
+        BeanUtils.copyProperties(dishDTO, dish);
         dishMapper.update(dish);
         dishDTO.getFlavors().forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
         //删除菜品对应的口味数据
@@ -109,6 +113,33 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(flavors);
         }
 
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .status(status)
+                .id(id)
+                .build();
+        dishMapper.update(dish);
+        if (status == StatusConstant.DISABLE) {
+            List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(Arrays.asList(id));
+            if (setmealIds != null && setmealIds.size() > 0) {
+                setmealIds.forEach(setmealId->{
+                    Setmeal setmeal = Setmeal.builder()
+                            .id(setmealId)
+                            .status(StatusConstant.DISABLE)
+                            .build();
+                    setmealMapper.update(setmeal);
+                });
+            }
+        }
+    }
+
+    @Override
+    public List<DishVO> getDishByCategoryId(Long categoryId) {
+
+        return dishMapper.getDishByCategoryId(categoryId);
     }
 }
 
