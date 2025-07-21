@@ -3,6 +3,7 @@ package com.sky.mapper;
 
 import com.sky.entity.Dish;
 import com.sky.entity.SetmealDish;
+import com.sky.vo.DishItemVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -24,4 +25,8 @@ public interface SetmealDishMapper {
 
     @Select("select dish.* from setmeal_dish sd left join dish on sd.dish_id = dish.id where sd.setmeal_id = #{id}")
     List<Dish> getDishBySetmealId(Long id);
+
+
+    @Select("select sd.name,sd.copies,d.image,d.description from dish d left join setmeal_dish sd on d.id = sd.dish_id where sd.setmeal_id=#{setmealId}")
+    List<DishItemVO> getDishItemById(Long setmealId);
 }

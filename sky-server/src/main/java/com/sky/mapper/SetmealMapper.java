@@ -38,4 +38,5 @@ public interface SetmealMapper {
     Setmeal getByid(Long id);
 
 
+    List<Setmeal> list(Setmeal setmeal);
 }
