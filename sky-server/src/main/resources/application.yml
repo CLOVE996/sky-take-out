@@ -15,7 +15,7 @@ spring:
     redis:
       host: ${sky.redis.host}
       port: ${sky.redis.port}
-      datebase: ${sky.redis.database}
+      database: ${sky.redis.database}
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
